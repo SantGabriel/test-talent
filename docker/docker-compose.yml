@@ -1,0 +1,29 @@
+services:
+  web:
+    build: ./web
+    image: web-laravel
+    container_name: web-talent
+    ports:
+      - "8000:80"
+    volumes:
+      - ../.:/var/www/html
+    environment:
+      XDEBUG_MODE: debug
+      XDEBUG_CLIENT_HOST: host.docker.internal
+      PHP_IDE_CONFIG: serverName=debug
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  mysql:
+    build: ./mysql
+    image: mysql-8
+    container_name: mysql-talent
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+  gt:
+    image: matheusprotzen/gateways-mock
+    container_name: gt-talent
+    ports:
+      - "3001:3001"
+      - "3002:3002"
