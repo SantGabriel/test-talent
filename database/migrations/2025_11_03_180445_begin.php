@@ -48,8 +48,8 @@ return new class extends Migration
         // transactions
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients','id');
-            $table->foreignId('gateway_id')->constrained('gateways','id');
+            $table->foreignId('client')->constrained('clients','id');
+            $table->foreignId('gateway')->constrained('gateways','id');
             $table->string('external_id')->nullable();
             $table->string('status');
             $table->decimal('amount', 10, 2);
@@ -60,8 +60,8 @@ return new class extends Migration
         // transaction_products
         Schema::create('transaction_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->integer('quantity');
             $table->timestamps();
         });
