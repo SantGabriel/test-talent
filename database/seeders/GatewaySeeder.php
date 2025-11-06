@@ -16,18 +16,21 @@ class GatewaySeeder extends Seeder
             'name' => 'Gt1',
             'is_active' => true,
             'priority' => 1,
+            'alias' => 'Gt1'
         ]);
 
         Gateway::create([
             'name' => 'Gt2',
             'is_active' => true,
             'priority' => 2,
+            'alias' => 'Gt2'
         ]);
 
         Gateway::create([
             'name' => 'Gt Fake',
             'is_active' => false,
             'priority' => 3,
+            'alias' => 'GtFake'
         ]);
     }
 }

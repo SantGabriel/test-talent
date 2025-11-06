@@ -20,6 +20,7 @@ class GatewayFactory extends Factory
         return [
             'name' => $this->faker->company(),
             'is_active' => $this->faker->boolean(),
+            'alias' => $this->faker->company(),
             'priority' => $this->faker->numberBetween(1, 10),
         ];
     }

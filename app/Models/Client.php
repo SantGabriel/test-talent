@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 
 /**
- * Client Model
  *
  * @property int $id
  * @property string $name
@@ -52,6 +51,6 @@ class Client extends Model
      */
     public function transactions(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class, 'client', 'id');
     }
 }

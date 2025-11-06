@@ -2,10 +2,35 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $alias
+ * @property bool $is_active
+ * @property int $priority
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Collection|Transaction[] $transactions
+ *
+ * @method static Gateway find($id)
+ * @method static Gateway findOrFail($id)
+ * @method static Gateway first()
+ * @method static Gateway firstOrFail()
+ * @method static Builder where($column, $operator = null, $value = null)
+ * @method static Gateway create(array $attributes = [])
+ * @method bool update(array $attributes = [], array $options = [])
+ * @method bool delete()
+ * @method bool save(array $options = [])
+ */
 class Gateway extends Model
 {
     use HasFactory;
@@ -20,6 +45,7 @@ class Gateway extends Model
         'name',
         'is_active',
         'priority',
+        'alias'
     ];
 
     /**
@@ -37,6 +63,6 @@ class Gateway extends Model
      */
     public function transactions(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class, 'gateway', 'id');
     }
 }

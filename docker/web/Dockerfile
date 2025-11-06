@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
         && pecl install xdebug \
         && docker-php-ext-enable xdebug
 
+RUN pecl install redis && docker-php-ext-enable redis
+
 RUN a2enmod rewrite
 
 COPY ./apache.conf /etc/apache2/sites-available/000-default.conf

@@ -2,7 +2,6 @@ services:
   web:
     build: ./web
     image: web-laravel
-    user: "${UID}:${GID}"
     container_name: web-talent
     ports:
       - "8000:80"
@@ -27,6 +26,11 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql/data:/var/lib/mysql
+  redis:
+    image: redis:7
+    container_name: redis-talent
+    ports:
+      - "6379:6379"
   gt:
     image: matheusprotzen/gateways-mock
     container_name: gt-talent

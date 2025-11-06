@@ -1,0 +1,7 @@
+<?php
+return [
+    'GATEWAY_GT1_EMAIL' => env('GATEWAY_GT1_EMAIL'),
+    'GATEWAY_GT1_TOKEN' => env('GATEWAY_GT1_TOKEN'),
+    'GATEWAY_GT2_SECRET' => env('GATEWAY_GT2_SECRET'),
+    'GATEWAY_GT2_TOKEN' => env('GATEWAY_GT2_TOKEN'),
+];

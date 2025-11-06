@@ -21,16 +21,16 @@ Route::prefix('user')->group(function () {
 /************ Transaction ************/
 Route::prefix('transaction')->group(function () {
     //Realizar uma compra informando o produto
-    Route::post('/begin', [TransactionController::class, 'index']);
+    Route::post('/begin', [TransactionController::class, 'new']);
 
     // Listar todas as compras
-    Route::get('/list', [TransactionController::class, 'index']);
+    Route::get('/list', [TransactionController::class, 'list']);
 
     // Detalhes de uma compra
-    Route::get('/get/{id}', [TransactionController::class, 'index']);
+    Route::get('/get/{id}', [TransactionController::class, 'get']);
 
     // Realizar reembolso de uma compra junto ao gateway com validação por roles
-    Route::post('/refund/id', [TransactionController::class, 'index']);
+    Route::post('/refund/id', [TransactionController::class, 'refund']);
 });
 
 /************ Gateway ************/
