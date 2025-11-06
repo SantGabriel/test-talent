@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ClientController;
@@ -7,34 +8,43 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
 
 /************ User ************/
+
 Route::prefix('user')->group(function () {
-    //Realizar o login
     Route::post('/login', [UserController::class, 'login']);
 
-    //CRUD de usuários com validação por roles
-    Route::get('/', [UserController::class, 'read']);
-    Route::post('/', [UserController::class, 'create']);
-    Route::put('/', [UserController::class, 'update']);
-    Route::delete('/', [UserController::class, 'delete']);
+    Route::middleware(['auth:manager'])->group(function () {
+        Route::get('/{id}', [UserController::class, 'read']);
+        Route::post('/', [UserController::class, 'create']);
+        Route::put('/{id}', [UserController::class, 'update']);
+        Route::delete('/{id}', [UserController::class, 'delete']);
+
+    });
 });
 
 /************ Transaction ************/
 Route::prefix('transaction')->group(function () {
-    //Realizar uma compra informando o produto
-    Route::post('/begin', [TransactionController::class, 'new']);
 
-    // Listar todas as compras
-    Route::get('/list', [TransactionController::class, 'list']);
+    Route::middleware(['auth:user'])->group(function () {
+        //Realizar uma compra informando o produto
+        Route::post('/begin', [TransactionController::class, 'new']);
 
-    // Detalhes de uma compra
-    Route::get('/get/{id}', [TransactionController::class, 'get']);
+        // Listar todas as compras
+        Route::get('/list', [TransactionController::class, 'list']);
+        // Listar todas as compras
+        Route::get('/listFromGateway', [TransactionController::class, 'listFromGateway']);
 
-    // Realizar reembolso de uma compra junto ao gateway com validação por roles
-    Route::post('/refund/id', [TransactionController::class, 'refund']);
+        // Detalhes de uma compra
+        Route::get('/get/{id}', [TransactionController::class, 'get']);
+    });
+
+    Route::middleware(['auth:finance'])->group(function () {
+        // Realizar reembolso de uma compra junto ao gateway com validação por roles
+        Route::post('/refund/{id}', [TransactionController::class, 'refund']);
+    });
 });
 
 /************ Gateway ************/
-Route::prefix('gateway')->group(function () {
+Route::prefix('gateway')->middleware(['auth:user'])->group(function () {
     // Ativar/desativar um gateway
     Route::get('/active/{id}', [GatewayController::class, 'active']);
 
@@ -43,7 +53,7 @@ Route::prefix('gateway')->group(function () {
 });
 
 /************ Product ************/
-Route::prefix('product')->group(function () {
+Route::prefix('product')->middleware(['auth:manager,finance'])->group(function () {
     // CRUD de produtos com validação por roles
     Route::get('/', [ProductController::class, 'read']);
     Route::post('/', [ProductController::class, 'create']);
@@ -52,7 +62,7 @@ Route::prefix('product')->group(function () {
 });
 
 /************ Client ************/
-Route::prefix('client')->group(function () {
+Route::prefix('client')->middleware(['auth:manager'])->group(function () {
     // Listar todos os clientes
     Route::get('/', [ClientController::class, 'index']);
 
