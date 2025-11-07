@@ -13,11 +13,10 @@ Route::prefix('user')->group(function () {
     Route::post('/login', [UserController::class, 'login']);
 
     Route::middleware(['auth:manager'])->group(function () {
-        Route::get('/{id}', [UserController::class, 'read']);
         Route::post('/', [UserController::class, 'create']);
+        Route::get('/{id}', [UserController::class, 'read']);
         Route::put('/{id}', [UserController::class, 'update']);
         Route::delete('/{id}', [UserController::class, 'delete']);
-
     });
 });
 
@@ -46,7 +45,7 @@ Route::prefix('transaction')->group(function () {
 /************ Gateway ************/
 Route::prefix('gateway')->middleware(['auth:user'])->group(function () {
     // Ativar/desativar um gateway
-    Route::get('/active/{id}', [GatewayController::class, 'active']);
+    Route::get('/activate/{id}', [GatewayController::class, 'activate']);
 
     // Alterar a prioridade de um gateway
     Route::post('/priority/{id}', [GatewayController::class, 'priority']);
@@ -55,10 +54,10 @@ Route::prefix('gateway')->middleware(['auth:user'])->group(function () {
 /************ Product ************/
 Route::prefix('product')->middleware(['auth:manager,finance'])->group(function () {
     // CRUD de produtos com validação por roles
-    Route::get('/', [ProductController::class, 'read']);
+    Route::get('/{id}', [ProductController::class, 'read']);
     Route::post('/', [ProductController::class, 'create']);
-    Route::put('/', [ProductController::class, 'update']);
-    Route::delete('/', [ProductController::class, 'delete']);
+    Route::put('/{id}', [ProductController::class, 'update']);
+    Route::delete('/{id}', [ProductController::class, 'delete']);
 });
 
 /************ Client ************/

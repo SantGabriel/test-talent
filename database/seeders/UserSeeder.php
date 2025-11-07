@@ -15,6 +15,12 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         foreach (Role::cases() as $role) {
+            if ($role == Role::ADMIN) {
+                User::factory()->create([
+                    'role' => $role,
+                    'email' => "admin@gmail.com"
+                ]);
+            }
             User::factory()->create([
                 'role' => $role
             ]);

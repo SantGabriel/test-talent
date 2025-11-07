@@ -22,7 +22,6 @@ class Auth
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         try {
-            /**@var User $user*/
             $user = JWTAuth::parseToken()->authenticate();
         } catch (TokenExpiredException $e) {
             return response()->json(['error' => 'Token expirado'], 401);

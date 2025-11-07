@@ -55,8 +55,9 @@ class UserController extends Controller
     public function read(Request $request): JsonResponse {
         $id = $request->route('id');
         $user = $this->userService->read($id);
+        $d = $user->toArray();
         if($user)
-            return response()->json($user,Response::HTTP_OK);
+            return response()->json($user->toArray(),Response::HTTP_OK);
         else
             return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
     }

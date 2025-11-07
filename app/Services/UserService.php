@@ -18,8 +18,6 @@ class UserService
 
         $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
         return $token;
-//        JWTAuth::claims(['role' => ])->fromUser($user);
-//        return view('login');
     }
 
     public function create(array $params): int {
@@ -37,6 +35,8 @@ class UserService
     }
 
     public function read(int $id): ?User {
-        return User::find($id);
+        return User::where("id",$id)->select([
+            'id', 'email', 'role'
+        ])->first();
     }
 }
