@@ -12,7 +12,7 @@ class PaymentGateway extends AbstractPaymentGateway
     private string $secret;
     private string $token;
     public function __construct(
-        protected Gateway $gateway,
+        public Gateway $gateway,
         protected string $base_url = "http://gt:3002"
     )
     {
@@ -30,7 +30,6 @@ class PaymentGateway extends AbstractPaymentGateway
                 "secret" => $this->secret,
                 "token" => $this->token,
             ]);
-        $oi = $response->body();
         return $response->body();
     }
 
@@ -41,7 +40,12 @@ class PaymentGateway extends AbstractPaymentGateway
 
     public function listTransactions(): array
     {
-        // TODO: Implement listTransactions() method.
+        $response = Http::withHeaders($this->defaultAuthHeader())
+            ->get("{$this->base_url}/transacoes", [
+                "secret" => $this->secret,
+                "token" => $this->token,
+            ]);
+        return $response->json();
     }
 
     public function login(): void

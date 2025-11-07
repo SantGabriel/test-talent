@@ -12,7 +12,7 @@ abstract class AbstractPaymentGateway
     protected string $gt_preffix;
 
     public function __construct(
-        protected Gateway $gateway,
+        public Gateway $gateway,
         protected string $base_url
     ) {
     }

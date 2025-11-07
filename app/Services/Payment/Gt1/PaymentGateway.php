@@ -14,7 +14,7 @@ class PaymentGateway extends AbstractPaymentGateway
     private string $token;
 
     public function __construct(
-        protected Gateway $gateway,
+        public Gateway $gateway,
         protected string $base_url = "http://gt:3001"
     )
     {
@@ -27,12 +27,7 @@ class PaymentGateway extends AbstractPaymentGateway
     }
     public function transaction(): mixed
     {
-        $response = Http::withHeaders($h = $this->defaultAuthHeader())
-            ->get("{$this->base_url}/transactions", [
-                "email" => $this->email,
-                "token" => $this->token,
-            ]);
-        return $response->body();
+        // TODO: Implement transaction() method.
     }
 
     public function refund(): mixed
@@ -42,7 +37,9 @@ class PaymentGateway extends AbstractPaymentGateway
 
     public function listTransactions(): array
     {
-        // TODO: Implement listTransactions() method.
+        $response = Http::withHeaders($this->defaultAuthHeader())
+            ->get("{$this->base_url}/transactions");
+        return $response->json();
     }
 
     public function login(): void
