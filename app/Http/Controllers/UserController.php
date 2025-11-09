@@ -39,7 +39,7 @@ class UserController extends Controller
         if($response)
             return response()->json('',Response::HTTP_NO_CONTENT);
         else
-            return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Falha'], Response::HTTP_NOT_FOUND);
     }
 
     public function delete(Request $request): JsonResponse {
@@ -49,7 +49,7 @@ class UserController extends Controller
         if($response)
             return response()->json('',Response::HTTP_NO_CONTENT);
         else
-            return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Falha'], Response::HTTP_NOT_FOUND);
     }
 
     public function read(Request $request): JsonResponse {
@@ -59,6 +59,6 @@ class UserController extends Controller
         if($user)
             return response()->json($user->toArray(),Response::HTTP_OK);
         else
-            return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Falha'], Response::HTTP_NOT_FOUND);
     }
 }

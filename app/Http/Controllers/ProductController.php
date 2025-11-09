@@ -26,7 +26,7 @@ class ProductController extends Controller
         if($response)
             return response()->json('',Response::HTTP_NO_CONTENT);
         else
-            return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Falha'], Response::HTTP_NOT_FOUND);
     }
 
     public function delete(Request $request): JsonResponse {
@@ -35,7 +35,7 @@ class ProductController extends Controller
         if($response)
             return response()->json('',Response::HTTP_NO_CONTENT);
         else
-            return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Falha'], Response::HTTP_NOT_FOUND);
     }
 
     public function read(Request $request): JsonResponse {
@@ -44,6 +44,6 @@ class ProductController extends Controller
         if($product)
             return response()->json($product,Response::HTTP_OK);
         else
-            return response()->json(['error' => 'Falha'], Response::HTTP_BAD_REQUEST);
+            return response()->json(['error' => 'Falha'], Response::HTTP_NOT_FOUND);
     }
 }

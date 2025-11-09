@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
+use App\Models\Gateway;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -81,12 +82,13 @@ class UserTest extends TestCase
     public function testRolesRoute() {
         // Admin
         $token = $this->generateToken(Role::ADMIN);
-        $response = $this->get('api/gateway/activate/1', $this->getAuth($token));
-        $response->assertStatus(Response::HTTP_OK);
+        $gt = Gateway::factory()->create();
+        $response = $this->post("api/gateway/activate/{$gt->id}", ['is_active' => true] ,$this->getAuth($token));
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
 
         // Manager
         $token = $this->generateToken(Role::MANAGER);
-        $response = $this->get('api/gateway/activate/1', $this->getAuth($token));
+        $response = $this->post('api/gateway/activate/1', ['is_active' => true], $this->getAuth($token));
         $response->assertStatus(Response::HTTP_FORBIDDEN);
 
         // Finance

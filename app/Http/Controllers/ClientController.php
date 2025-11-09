@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Services\ClientService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 
 class ClientController extends Controller
@@ -26,6 +27,6 @@ class ClientController extends Controller
         if($client)
             return response()->json($client);
         else
-            return response()->json("Not found",404);
+            return response()->json("Not found",Response::HTTP_NOT_FOUND);
     }
 }

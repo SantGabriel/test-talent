@@ -45,7 +45,7 @@ Route::prefix('transaction')->group(function () {
 /************ Gateway ************/
 Route::prefix('gateway')->middleware(['auth:user'])->group(function () {
     // Ativar/desativar um gateway
-    Route::get('/activate/{id}', [GatewayController::class, 'activate']);
+    Route::post('/activate/{id}', [GatewayController::class, 'activate']);
 
     // Alterar a prioridade de um gateway
     Route::post('/priority/{id}', [GatewayController::class, 'priority']);
