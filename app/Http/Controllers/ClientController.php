@@ -3,26 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Services\ClientService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
 class ClientController extends Controller
 {
-    public function __construct()
+    public function __construct(private ClientService $clientService)
     {
     }
 
-    public function index(): JsonResponse
+    public function list(): JsonResponse
     {
-        $clients = Client::all();
-
-        return response()->json($clients);
+        return response()->json($this->clientService->list());
     }
 
-    public function show(Request $request): JsonResponse
+    public function getById(Request $request): JsonResponse
     {
         $id = $request->route('id',0);
-        return response()->json(Client::find($id));
+        $client = $this->clientService->getById($id);
+        if($client)
+            return response()->json($client);
+        else
+            return response()->json("Not found",404);
     }
 }

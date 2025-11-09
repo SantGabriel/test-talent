@@ -79,7 +79,6 @@ class UserTest extends TestCase
     }
 
     public function testRolesRoute() {
-        // TODO uncomment when GatewayController is done
         // Admin
         $token = $this->generateToken(Role::ADMIN);
         $response = $this->get('api/gateway/activate/1', $this->getAuth($token));
@@ -99,5 +98,8 @@ class UserTest extends TestCase
         $token = $this->generateToken(Role::USER);
         $response = $this->get('api/user/1', $this->getAuth($token));
         $response->assertStatus(Response::HTTP_FORBIDDEN);
+
+        //No Auth
+        //TODO create test for transaction when his controler is done
     }
 }

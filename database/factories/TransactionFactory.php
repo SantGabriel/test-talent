@@ -21,8 +21,8 @@ class TransactionFactory extends Factory
     public function definition(): array
     {
         return [
-            'client' => Client::factory(),
-            'gateway' => Gateway::factory(),
+            'client' => Client::inRandomOrder()->first(),
+            'gateway' => Gateway::inRandomOrder()->first(),
             'external_id' => bin2hex(random_bytes(8)),
             'status' => PaymentStatus::DONE->value,
             'amount' => $this->faker->randomFloat(2, 10, 1000),

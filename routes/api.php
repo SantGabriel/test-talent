@@ -63,10 +63,10 @@ Route::prefix('product')->middleware(['auth:manager,finance'])->group(function (
 /************ Client ************/
 Route::prefix('client')->middleware(['auth:manager'])->group(function () {
     // Listar todos os clientes
-    Route::get('/', [ClientController::class, 'index']);
+    Route::get('/', [ClientController::class, 'list']);
 
     // Detalhe do cliente e todas suas compras
-    Route::get('/{id}', [ClientController::class, 'show']);
+    Route::get('/{id}', [ClientController::class, 'getById']);
 });
 
 
