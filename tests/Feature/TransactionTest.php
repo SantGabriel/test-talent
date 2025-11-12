@@ -21,7 +21,7 @@ class TransactionTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function testBeginTransaction(): void
+    public function testBeginTransaction(): Transaction
     {
         $client = Client::factory()->create();
         $qtdProducts = rand(1, 10);
@@ -43,7 +43,7 @@ class TransactionTest extends TestCase
         ];
         $response = $this->post('api/transaction/begin', $transactionArrayDTO, $this->getAuth());
 
-        // Testa se a transaçaõ foi feita
+        // Testa se a transação foi feita
         $this->assertNotEquals("Transaction failed. Try Again later", $response->json());
 
         $idTransaction = $response->json('id');
@@ -54,10 +54,6 @@ class TransactionTest extends TestCase
         $this->assertEquals($client->id, $transaction->client);
         $this->assertEquals(sizeof($transactionProductList), $qtdProducts);
 
-        //Testa se usou o gateway mais prioritario
-        $gatewayPrioritario = Gateway::where('is_active', true)->orderBy('priority')->first();
-        $this->assertEquals($gatewayPrioritario, $transaction->gatewayClass);
-
         $sum = 0;
         foreach ($transactionProductList as $transactionProduct) {
             $sum += $transactionProduct->product->amount * $transactionProduct->quantity;
@@ -67,15 +63,68 @@ class TransactionTest extends TestCase
         // Testa se somou tudo certo
         $this->assertEquals($sum, $transaction->amount);
         $response->assertStatus(Response::HTTP_OK);
+        return $transaction;
+    }
+
+    public function testGt1() {
+
+        Gateway::where('alias', 'Gt1')->update([
+            'is_active' => true,
+            'priority' => 0
+        ]);
+        $transaction = $this->testBeginTransaction();
+
+        $gatewayPrioritario = Gateway::where('is_active', true)->orderBy('priority')->firstOrFail();
+        $this->assertEquals($gatewayPrioritario, $transaction->gatewayClass);
+
+    }
+
+    public function testGt2() {
+        Gateway::where('alias', 'Gt1')->update([
+            'is_active' => true,
+            'priority' => 0
+        ]);
+        $transaction = $this->testBeginTransaction();
+
+        $gatewayPrioritario = Gateway::where('is_active', true)->orderBy('priority')->firstOrFail();
+        $this->assertEquals($gatewayPrioritario->toArray(), $transaction->gatewayClass->toArray());
     }
 
     public function testTransactionFakeGatewayHighestPriority()
     {
-        
+        Gateway::where('alias', 'GtFake')->update([
+            'is_active' => true,
+            'priority' => 1
+        ]);
+        $gatewayPrioritario = Gateway::where('alias', 'Gt2')->firstOrFail();
+        $gatewayPrioritario->update([
+            'is_active' => true,
+            'priority' => 2
+        ]);
+        Gateway::where('alias', 'Gt1')->update([
+            'is_active' => true,
+            'priority' => 3
+        ]);
+
+        $transaction = $this->testBeginTransaction();
+
+        $this->assertEquals($gatewayPrioritario->toArray(), $transaction->gatewayClass->toArray());
     }
 
     public function testTransactionDeactiveGateway()
     {
+        Gateway::where('alias', 'Gt1')->update([
+            'is_active' => false,
+            'priority' => 2
+        ]);
+        $gatewayPrioritario = Gateway::where('alias', 'Gt2')->firstOrFail();
+        $gatewayPrioritario->update([
+            'is_active' => true,
+            'priority' => 3
+        ]);
 
+        $transaction = $this->testBeginTransaction();
+
+        $this->assertEquals($gatewayPrioritario->toArray(), $transaction->gatewayClass->toArray());
     }
 }

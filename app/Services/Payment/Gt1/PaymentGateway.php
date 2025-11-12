@@ -42,7 +42,7 @@ class PaymentGateway extends AbstractPaymentGateway
     public function transaction(Collection $productDTOList, Client $client, string $cardNumber, string $cvv): ?Transaction
     {
         $totalValue = $this->calculateValue($productDTOList);
-        $totalValue100 = $totalValue * 100;
+        $totalValue100 = round($totalValue * 100);
         $response = Http::withHeaders($this->defaultAuthHeader())
             ->post("{$this->base_url}/transactions", [
                 "amount" => $totalValue100, // Vi que a API so aceita integer. Então estou supondo que é um gateway que diz -> R$ 10,59 = 1059
@@ -76,15 +76,6 @@ class PaymentGateway extends AbstractPaymentGateway
         return $transaction;
     }
 
-    public function convertCommonPaymentData(PaymentData $paymentData): CommonPaymentData
-    {
-        return new CommonPaymentData([
-            "id" => $paymentData->id,
-            "status" => $this->convertStatus($paymentData->status),
-            "amount" => $paymentData->amount
-        ]);
-    }
-
     public function convertStatus(string $status)
     {
         return match ($status) {
@@ -104,7 +95,7 @@ class PaymentGateway extends AbstractPaymentGateway
         $paymentDataList = collect($response->json('data'))->map(fn($params) => new PaymentData($params));
         /** @var PaymentData $paymentData */
         $paymentData = $paymentDataList->firstWhere('id', $external_id);
-        return $this->convertCommonPaymentData($paymentData);
+        return $this->convertCommonPaymentData($paymentData->id, $paymentData->status, $paymentData->amount);
     }
 
     public function refund(): mixed

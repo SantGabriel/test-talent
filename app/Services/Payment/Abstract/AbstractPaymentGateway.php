@@ -83,4 +83,13 @@ abstract class AbstractPaymentGateway
     abstract public function login(): void;
 
     abstract public function defaultAuthHeader(): array;
+
+    public function convertCommonPaymentData($id, $status, $amount ): CommonPaymentData
+    {
+        return new CommonPaymentData([
+            "id" => $id,
+            "status" => $this->convertStatus($status),
+            "amount" => $amount
+        ]);
+    }
 }

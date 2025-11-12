@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Payment\Gt2;
+namespace App\Services\Payment\GtFake;
 
 use App\DTO\ProductDTO;
 use App\Enums\PaymentStatus;
@@ -20,11 +20,11 @@ class PaymentGateway extends AbstractPaymentGateway
     private string $token;
     public function __construct(
         public Gateway $gateway,
-        protected string $base_url = "http://gt:3002"
+        protected string $base_url = "http://fake_url"
     )
     {
         parent::__construct($gateway, $base_url);
-        $this->gt_preffix = 'GATEWAY_GT2_';
+        $this->gt_preffix = 'GATEWAY_GTFAKE_';
         $this->secret = config("gateway.{$this->gt_preffix}SECRET");
         $this->token = config("gateway.{$this->gt_preffix}TOKEN");
         $this->id_token = Cache::get("{$this->gt_preffix}auth_token");
@@ -37,39 +37,7 @@ class PaymentGateway extends AbstractPaymentGateway
      */
     public function transaction(Collection $productDTOList, Client $client, string $cardNumber, string $cvv): ?Transaction
     {
-        $totalValue = $this->calculateValue($productDTOList);
-        $totalValue100 = round($totalValue * 100);
-        $response = Http::withHeaders($this->defaultAuthHeader())
-            ->post("{$this->base_url}/transacoes", [
-                "valor" => $totalValue100, // Vi que a API so aceita integer. Então estou supondo que é um gateway que diz -> R$ 10,59 = 1059
-                "nome" => $client->name,
-                "email" => $client->email,
-                "numeroCartao" => $cardNumber,
-                "cvv" => $cvv,
-            ]);
-        if($response->failed()) return null;
-        $external_id = $response->json('id');
-
-        if(!$external_id) return null;
-        $transaction = Transaction::create([
-            'client' => $client->id,
-            'external_id' => $external_id,
-            'amount' => $totalValue,
-            'gateway' => $this->gateway->id,
-            'status' => PaymentStatus::PENDING->value,
-            'card_last_numbers' => substr($cardNumber,-4)
-        ]);
-        $this->checkChangeStatus($transaction);
-
-        foreach ($productDTOList as $productDTO) {
-            TransactionProduct::create([
-                'product_id' => $productDTO->id,
-                'transaction_id' => $transaction->id,
-                'quantity' => $productDTO->quantity
-            ]);
-        }
-
-        return $transaction;
+        return null;
     }
 
     public function convertStatus(string $status): PaymentStatus
@@ -77,12 +45,11 @@ class PaymentGateway extends AbstractPaymentGateway
         return match ($status) {
             "pending" => PaymentStatus::PENDING,
             "paid" => PaymentStatus::DONE,
-            "refused" => PaymentStatus::REFUSED,
+            "canceled" => PaymentStatus::REFUSED,
             "refunded" => PaymentStatus::REFUNDED,
             "refund_requested" => PaymentStatus::REFUND_REQUESTED,
         };
     }
-
 
     public function getPaymentData(string $external_id): ?CommonPaymentData
     {
@@ -97,17 +64,12 @@ class PaymentGateway extends AbstractPaymentGateway
 
     public function refund(): mixed
     {
-        // TODO: Implement refund() method.
+        return null;
     }
 
     public function listTransactions(): array
     {
-        $response = Http::withHeaders($this->defaultAuthHeader())
-            ->get("{$this->base_url}/transacoes", [
-                "secret" => $this->secret,
-                "token" => $this->token,
-            ]);
-        return $response->json();
+        return [];
     }
 
     public function login(): void
@@ -118,9 +80,6 @@ class PaymentGateway extends AbstractPaymentGateway
 
     public function defaultAuthHeader(): array
     {
-        return [
-            "Gateway-Auth-Token" => $this->token,
-            "Gateway-Auth-Secret" => $this->secret,
-        ];
+        return [];
     }
 }
