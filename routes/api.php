@@ -22,11 +22,10 @@ Route::prefix('user')->group(function () {
 
 /************ Transaction ************/
 Route::prefix('transaction')->group(function () {
+    //Realizar uma compra informando o produto
+    Route::post('/begin', [TransactionController::class, 'beginTransaction']);
 
     Route::middleware(['auth:user'])->group(function () {
-        //Realizar uma compra informando o produto
-        Route::post('/begin', [TransactionController::class, 'new']);
-
         // Listar todas as compras
         Route::get('/list', [TransactionController::class, 'list']);
         // Listar todas as compras

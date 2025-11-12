@@ -3,6 +3,7 @@
 namespace App\Services\Payment;
 
 use App\Models\Gateway;
+use App\Services\Payment\Abstract\AbstractPaymentGateway;
 
 class PaymentGatewayService
 {
@@ -16,7 +17,10 @@ class PaymentGatewayService
     public function instantiateAll(): void
     {
         /*** @var Gateway[] $gatewayList */
-        $gatewayList = Gateway::where("is_active", true)->get();
+        $gatewayList = Gateway::where("is_active", true)
+            ->orderBy('priority')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
         foreach ($gatewayList as $gateway) {
             $paymentGateway = $this->instantiatePaymentGateway($gateway);
@@ -37,13 +41,5 @@ class PaymentGatewayService
         foreach ($this->paymentGatewayList as $paymentGateway) {
             $paymentGateway->login();
         }
-    }
-    public function startPayment()
-    {
-        foreach ($this->paymentGatewayList as $paymentGateway) {
-            $transaction = $paymentGateway->transaction();
-            if($transaction) return $transaction; //transaction funcionou
-        }
-        return false;
     }
 }

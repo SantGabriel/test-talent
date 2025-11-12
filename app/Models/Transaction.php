@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -9,17 +10,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 /**
  *
- * @property int $id
- * @property string $name
- * @property string $email
+ * @property int $client
+ * @property int $gateway
+ * @property string $external_id
+ * @property PaymentStatus $status
+ * @property float $amount
+ * @property string $card_last_numbers
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Collection|Transaction[] $transactions
  * @property-read Gateway gatewayClass
  * @property-read Client clientClass
+ * @property-read Collection|TransactionProduct[] $transactionProducts
  *
  *
  * @method static Transaction find($id)
@@ -58,6 +64,7 @@ class Transaction extends Model
      */
     protected $casts = [
         'amount' => 'decimal:2',
+        'status' => PaymentStatus::class,
     ];
 
     /**
@@ -77,12 +84,10 @@ class Transaction extends Model
     }
 
     /**
-     * Get the products for the transaction.
+     * Get the transaction products for the product.
      */
-    public function products(): BelongsToMany
+    public function transactionProducts(): HasMany
     {
-        return $this->belongsToMany(Product::class, 'transaction_products')
-            ->withPivot('quantity')
-            ->withTimestamps();
+        return $this->hasMany(TransactionProduct::class);
     }
 }

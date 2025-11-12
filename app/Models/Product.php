@@ -15,17 +15,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property float $amount
- * @property bool $active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Collection|Transaction[] $transactions
+ * @property-read Collection|TransactionProduct[] $transactionProducts
  *
  * @method static Product find($id)
  * @method static Product findOrFail($id)
  * @method static Product first()
  * @method static Product firstOrFail()
- * @method static Builder<Product> where($column, $operator = null, $value = null)
+ * @method static Builder where($column, $operator = null, $value = null)
+ * @method static Builder whereIn($column, $values, $boolean = 'and', $not = false)
  * @method static Product create(array $attributes = [])
  * @method bool update(array $attributes = [], array $options = [])
  * @method bool delete()
@@ -43,8 +43,7 @@ class Product extends Model
      */
     protected $fillable = [
         'name',
-        'amount',
-        'active'
+        'amount'
     ];
 
     /**

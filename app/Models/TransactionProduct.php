@@ -2,10 +2,36 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ *
+ * @property int $transaction_id
+ * @property int $product_id
+ * @property int $quantity
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Product product
+ * @property-read Transaction transaction
+ *
+ *
+ * @method static TransactionProduct find($id)
+ * @method static TransactionProduct findOrFail($id)
+ * @method static TransactionProduct first()
+ * @method static TransactionProduct firstOrFail()
+ * @method static Builder where($column, $operator = null, $value = null)
+ * @method static TransactionProduct create(array $attributes = [])
+ * @method bool update(array $attributes = [], array $options = [])
+ * @method bool delete()
+ * @method bool save(array $options = [])
+ */
 class TransactionProduct extends Model
 {
     use HasFactory;
