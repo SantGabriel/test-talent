@@ -31,7 +31,7 @@ class Auth
             return response()->json(['error' => 'Token ausente'], 401);
         }
 
-        if( $user->role->value !== Role::ADMIN->value && !in_array($user->role, $roles) ) {
+        if( $user->role !== Role::ADMIN && !in_array($user->role->value, $roles) ) {
             return response()->json(['error' => 'Acesso negado'], 403);
         }
 

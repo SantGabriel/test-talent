@@ -30,8 +30,8 @@ class TransactionRequest extends FormRequest
             'products' => 'required|array',
             'products.*.id' => 'required|integer',
             'products.*.quantity' => 'required|integer',
-            'card_numbers' => 'required|digits_between:13,19',
-            'cvv' => 'required|digits_between:3,4',
+            'card_numbers' => 'required|digits:16',
+            'cvv' => 'required|digits:3',
         ];
     }
 

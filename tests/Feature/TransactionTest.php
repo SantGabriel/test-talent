@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\DTO\ProductDTO;
 use App\DTO\TransactionDTO;
 use App\Enums\PaymentStatus;
+use App\Enums\Role;
 use App\Models\Client;
 use App\Models\Gateway;
 use App\Models\Product;
@@ -68,7 +69,7 @@ class TransactionTest extends TestCase
             "card_numbers" => '1234123412341234',
             "cvv" => '123'
         ];
-        $response = $this->post('api/transaction/begin', $transactionArrayDTO, $this->getAuth());
+        $response = $this->post('api/transaction/begin', $transactionArrayDTO);
 
         // Testa se a transação foi feita
         $this->assertNotEquals("Transaction failed. Try Again later", $response->json());
@@ -161,7 +162,8 @@ class TransactionTest extends TestCase
     public function testRefundGt1()
     {
         $transaction = $this->testGt1();
-        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth());
+        $token = $this->generateToken(Role::FINANCE);
+        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth($token));
         $transaction = new Transaction($response->json());
 
         $this->assertEquals(PaymentStatus::REFUNDED, $transaction->status);
@@ -170,7 +172,8 @@ class TransactionTest extends TestCase
     public function testRefundGt2()
     {
         $transaction = $this->testGt2();
-        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth());
+        $token = $this->generateToken(Role::FINANCE);
+        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth($token));
         $transaction = new Transaction($response->json());
 
         $this->assertEquals(PaymentStatus::REFUNDED, $transaction->status);
@@ -178,10 +181,11 @@ class TransactionTest extends TestCase
 
     public function testRefundPending()
     {
+        $token = $this->generateToken(Role::FINANCE);
         $transaction = Transaction::factory()->create([
             'gateway' => Gateway::where('alias', 'GtFake')->firstOrFail()->id,
         ]);
-        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth());
+        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth($token));
         $transaction = new Transaction($response->json());
 
         $this->assertEquals(PaymentStatus::REFUND_REQUESTED, $transaction->status);
@@ -190,7 +194,8 @@ class TransactionTest extends TestCase
     public function testRefundNotFound()
     {
         $this->testGt2();
-        $response = $this->get("api/transaction/refund/0", $this->getAuth());
+        $token = $this->generateToken(Role::FINANCE);
+        $response = $this->get("api/transaction/refund/0", $this->getAuth($token));
 
         $response->assertContent("Refund failed. Try Again later");
     }

@@ -129,7 +129,7 @@ class PaymentGateway extends AbstractPaymentGateway
         ]);
         $response = json_decode($http_response->body());
         $this->id_token = $response->token;
-        Cache::put("{$this->gt_preffix}auth_token", $this->id_token, 3600);
+        Cache::put("{$this->gt_preffix}auth_token", $this->id_token, 60);
     }
 
     public function defaultAuthHeader(): array

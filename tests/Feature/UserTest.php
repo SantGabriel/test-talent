@@ -93,7 +93,7 @@ class UserTest extends TestCase
 
         // Finance
         $token = $this->generateToken(Role::FINANCE);
-        $response = $this->get('api/product/1', $this->getAuth($token));
+        $response = $this->get('api/client/1', $this->getAuth($token));
         $response->assertStatus(Response::HTTP_FORBIDDEN);
 
         // User
@@ -102,6 +102,7 @@ class UserTest extends TestCase
         $response->assertStatus(Response::HTTP_FORBIDDEN);
 
         //No Auth
-        //TODO create test for transaction when his controler is done
+        $response = $this->get('api/transaction/refund/1');
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 }
