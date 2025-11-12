@@ -55,6 +55,8 @@ class TransactionProduct extends Model
         'quantity' => 'integer',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     /**
      * Get the transaction that owns the transaction product.
      */

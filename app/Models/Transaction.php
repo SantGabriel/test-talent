@@ -56,6 +56,7 @@ class Transaction extends Model
         'amount',
         'card_last_numbers',
     ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     /**
      * The attributes that should be cast.

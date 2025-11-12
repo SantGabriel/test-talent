@@ -57,6 +57,7 @@ class Product extends Model
         'amount' => 'float',
         'active' => 'bool',
     ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     /**
      * Get the transaction products for the product.

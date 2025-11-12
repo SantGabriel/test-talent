@@ -45,6 +45,7 @@ class Client extends Model
         'name',
         'email',
     ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     /**
      * Get the transactions for the client.

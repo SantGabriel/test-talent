@@ -57,6 +57,7 @@ class Gateway extends Model
         'is_active' => 'boolean',
         'priority' => 'integer',
     ];
+    protected $hidden = ['created_at', 'updated_at'];
 
     /**
      * Get the transactions for the gateway.

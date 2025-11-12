@@ -6,6 +6,7 @@ use App\DTO\TransactionDTO;
 use App\Enums\PaymentStatus;
 use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
+use App\Models\TransactionProduct;
 use App\Services\Payment\Abstract\CommonPaymentData;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
@@ -25,9 +26,20 @@ class TransactionController extends Controller
     {
         $id = $request->route('id');
         $transaction = $this->transactionService->getTransaction($id);
-        if($transaction)
-            return response()->json($transaction);
-        else
+        if($transaction) {
+            $products = $transaction->transactionProducts->map(fn($transactionProducts) =>
+                /** @var TransactionProduct $transactionProducts */
+                $transactionProducts->product
+            );
+            return response()->json([
+                'id' => $transaction->id,
+                'status' => $transaction->status,
+                'amount' => $transaction->amount,
+                'card_last_numbers' => $transaction->card_last_numbers,
+                'client' => $transaction->clientClass,
+                'products' => $products,
+            ]);
+        }else
             return response()->json("Transaction do not exists");
     }
     public function beginTransaction(TransactionRequest $request)
