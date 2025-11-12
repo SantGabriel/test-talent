@@ -62,9 +62,11 @@ class PaymentGateway extends AbstractPaymentGateway
         return $this->convertCommonPaymentData($paymentData->id, $paymentData->status, $paymentData->amount);
     }
 
-    public function refund(): mixed
+    public function refund(int $id): ?Transaction
     {
-        return null;
+        $transaction = Transaction::find($id);
+        $transaction->update(['status' => PaymentStatus::REFUND_REQUESTED]);
+        return $transaction;
     }
 
     public function listTransactions(): array

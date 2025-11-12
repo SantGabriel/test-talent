@@ -4,7 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 class TransactionRequest extends FormRequest
 {
@@ -32,5 +33,16 @@ class TransactionRequest extends FormRequest
             'card_numbers' => 'required|digits_between:13,19',
             'cvv' => 'required|digits_between:3,4',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException(
+            $validator,
+            response()->json([
+                'message' => 'Invalid data',
+                'errors'  => $validator->errors(),
+            ], 400)
+        );
     }
 }

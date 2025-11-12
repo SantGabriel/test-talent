@@ -10,8 +10,8 @@ enum PaymentStatus: string
     case REFUNDED = 'refunded';
     case REFUND_REQUESTED = 'refund_requested';
 
-    public function isPeddingStatus(): bool
+    public function isFinalStatus(): bool
     {
-        return in_array($this, [self::PENDING, self::REFUND_REQUESTED]);
+        return in_array($this, [self::REFUSED, self::REFUND_REQUESTED]);
     }
 }

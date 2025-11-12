@@ -15,7 +15,7 @@ class ProductService
     }
 
     public function delete(int $id): bool {
-        return Product::find($id)?->update(['active' => 0]);
+        return Product::find($id)?->update(['is_active' => 0]);
     }
 
     public function read(int $id): ?Product {

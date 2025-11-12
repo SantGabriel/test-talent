@@ -37,7 +37,7 @@ Route::prefix('transaction')->group(function () {
 
     Route::middleware(['auth:finance'])->group(function () {
         // Realizar reembolso de uma compra junto ao gateway com validação por roles
-        Route::post('/refund/{id}', [TransactionController::class, 'refund']);
+        Route::get('/refund/{id}', [TransactionController::class, 'refund']);
     });
 });
 

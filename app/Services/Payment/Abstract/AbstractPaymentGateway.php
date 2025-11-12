@@ -35,14 +35,14 @@ abstract class AbstractPaymentGateway
      *
      * @return mixed
      */
-    abstract public function refund(): mixed;
+    abstract public function refund(int $id): ?Transaction;
 
     abstract public function convertStatus(string $status);
 
     public function checkChangeStatus(Transaction $transaction): void
     {
         //Se ja é o status final, não preciso atualizar
-        if(!$transaction->status->isPeddingStatus()) return;
+        if($transaction->status->isFinalStatus()) return;
         $commonPaymentData = $this->getPaymentData($transaction->external_id);
         if(!$commonPaymentData) return;
         $transaction->status = $commonPaymentData->status;

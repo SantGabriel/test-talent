@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\DTO\ProductDTO;
 use App\DTO\TransactionDTO;
+use App\Enums\PaymentStatus;
 use App\Models\Client;
 use App\Models\Gateway;
 use App\Models\Product;
@@ -21,6 +22,32 @@ class TransactionTest extends TestCase
     /**
      * A basic feature test example.
      */
+
+    public function testBadRequest()
+    {
+        $client = Client::factory()->create();
+        $qtdProducts = rand(1, 10);
+        $productList = Product::factory($qtdProducts)->create();
+
+        $productList = $productList->map(function ($product) {
+            $randomQuantity = rand(1, 10);
+            return [
+                'id' => $product->id,
+                'quantity' => $randomQuantity,
+            ];
+        })->toArray();
+        $transactionArrayDTO = [
+            "client_email" => $client->email,
+            "client_name" => $client->name,
+            "products" => $productList,
+            "card_numbers" => '1234123412341234',
+            "cvv" => '12355'
+        ];
+        $response = $this->post('api/transaction/begin', $transactionArrayDTO, $this->getAuth());
+
+        // Testa se a transação foi feita
+        $response->assertStatus(Response::HTTP_BAD_REQUEST);
+    }
     public function testBeginTransaction(): Transaction
     {
         $client = Client::factory()->create();
@@ -66,7 +93,8 @@ class TransactionTest extends TestCase
         return $transaction;
     }
 
-    public function testGt1() {
+    public function testGt1() : Transaction
+    {
 
         Gateway::where('alias', 'Gt1')->update([
             'is_active' => true,
@@ -76,11 +104,12 @@ class TransactionTest extends TestCase
 
         $gatewayPrioritario = Gateway::where('is_active', true)->orderBy('priority')->firstOrFail();
         $this->assertEquals($gatewayPrioritario, $transaction->gatewayClass);
-
+        return $transaction;
     }
 
-    public function testGt2() {
-        Gateway::where('alias', 'Gt1')->update([
+    public function testGt2() : Transaction
+    {
+        Gateway::where('alias', 'Gt2')->update([
             'is_active' => true,
             'priority' => 0
         ]);
@@ -88,6 +117,7 @@ class TransactionTest extends TestCase
 
         $gatewayPrioritario = Gateway::where('is_active', true)->orderBy('priority')->firstOrFail();
         $this->assertEquals($gatewayPrioritario->toArray(), $transaction->gatewayClass->toArray());
+        return $transaction;
     }
 
     public function testTransactionFakeGatewayHighestPriority()
@@ -126,5 +156,42 @@ class TransactionTest extends TestCase
         $transaction = $this->testBeginTransaction();
 
         $this->assertEquals($gatewayPrioritario->toArray(), $transaction->gatewayClass->toArray());
+    }
+
+    public function testRefundGt1()
+    {
+        $transaction = $this->testGt1();
+        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth());
+        $transaction = new Transaction($response->json());
+
+        $this->assertEquals(PaymentStatus::REFUNDED, $transaction->status);
+    }
+
+    public function testRefundGt2()
+    {
+        $transaction = $this->testGt2();
+        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth());
+        $transaction = new Transaction($response->json());
+
+        $this->assertEquals(PaymentStatus::REFUNDED, $transaction->status);
+    }
+
+    public function testRefundPending()
+    {
+        $transaction = Transaction::factory()->create([
+            'gateway' => Gateway::where('alias', 'GtFake')->firstOrFail()->id,
+        ]);
+        $response = $this->get("api/transaction/refund/{$transaction->id}", $this->getAuth());
+        $transaction = new Transaction($response->json());
+
+        $this->assertEquals(PaymentStatus::REFUND_REQUESTED, $transaction->status);
+    }
+
+    public function testRefundNotFound()
+    {
+        $this->testGt2();
+        $response = $this->get("api/transaction/refund/0", $this->getAuth());
+
+        $response->assertContent("Refund failed. Try Again later");
     }
 }

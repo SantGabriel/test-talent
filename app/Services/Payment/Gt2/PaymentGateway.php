@@ -46,7 +46,7 @@ class PaymentGateway extends AbstractPaymentGateway
                 "email" => $client->email,
                 "numeroCartao" => $cardNumber,
                 "cvv" => $cvv,
-            ]);
+        ]);
         if($response->failed()) return null;
         $external_id = $response->json('id');
 
@@ -78,7 +78,7 @@ class PaymentGateway extends AbstractPaymentGateway
             "pending" => PaymentStatus::PENDING,
             "paid" => PaymentStatus::DONE,
             "refused" => PaymentStatus::REFUSED,
-            "refunded" => PaymentStatus::REFUNDED,
+            "charged_back" => PaymentStatus::REFUNDED,
             "refund_requested" => PaymentStatus::REFUND_REQUESTED,
         };
     }
@@ -95,9 +95,19 @@ class PaymentGateway extends AbstractPaymentGateway
         return $this->convertCommonPaymentData($paymentData->id, $paymentData->status, $paymentData->amount);
     }
 
-    public function refund(): mixed
+    public function refund(int $id): ?Transaction
     {
-        // TODO: Implement refund() method.
+        $transaction = Transaction::find($id);
+        if(!$transaction) return null;
+        if(in_array($transaction->status, [PaymentStatus::REFUNDED,PaymentStatus::REFUND_REQUESTED])) return $transaction;
+        $response = Http::withHeaders($this->defaultAuthHeader())
+            ->post("{$this->base_url}/transacoes/reembolso", [
+                "id" => $transaction->external_id,
+        ]);
+        $erros = $response->json('erros');
+        if($erros) return null;
+        $this->checkChangeStatus($transaction);
+        return $transaction;
     }
 
     public function listTransactions(): array

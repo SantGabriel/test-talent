@@ -22,7 +22,7 @@ class TransactionService
     public function getTransaction(int $id): ?Transaction
     {
         $transaction = Transaction::find($id);
-        if($transaction?->status->isPeddingStatus()) {
+        if($transaction?->status->isFinalStatus()) {
             $paymentGateway = $this->paymentGatewayService->instantiatePaymentGateway($transaction->gatewayClass);
             $paymentGateway->checkChangeStatus($transaction);
         }
@@ -51,5 +51,12 @@ class TransactionService
             if(isset($transaction->id) && in_array($transaction->status,[PaymentStatus::DONE, PaymentStatus::PENDING])) break;
         }
         return $transaction;
+    }
+
+    public function refund(int $id): ?Transaction
+    {
+        $transaction = Transaction::find($id);
+        if(!$transaction) return null;
+        return $this->paymentGatewayService->instantiatePaymentGateway($transaction->gatewayClass)->refund($id);
     }
 }

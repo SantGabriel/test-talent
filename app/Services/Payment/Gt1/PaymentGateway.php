@@ -82,7 +82,7 @@ class PaymentGateway extends AbstractPaymentGateway
             "pending" => PaymentStatus::PENDING,
             "paid" => PaymentStatus::DONE,
             "refused" => PaymentStatus::REFUSED,
-            "refunded" => PaymentStatus::REFUNDED,
+            "charged_back" => PaymentStatus::REFUNDED,
             "refund_requested" => PaymentStatus::REFUND_REQUESTED,
         };
     }
@@ -98,9 +98,19 @@ class PaymentGateway extends AbstractPaymentGateway
         return $this->convertCommonPaymentData($paymentData->id, $paymentData->status, $paymentData->amount);
     }
 
-    public function refund(): mixed
+    public function refund(int $id): ?Transaction
     {
-        // TODO: Implement refund() method.
+        $transaction = Transaction::find($id);
+        if(!$transaction) return null;
+        if(in_array($transaction->status, [PaymentStatus::REFUNDED,PaymentStatus::REFUND_REQUESTED])) return $transaction;
+        $response = Http::withHeaders($this->defaultAuthHeader())
+            ->post("{$this->base_url}/transactions/{$transaction->external_id}/charge_back/");
+        $data = $response->json();
+        if(isset($data['erros'])) return null;
+        $paymentData = new PaymentData($data);
+        $status = $this->convertStatus($paymentData->status);
+        $transaction->update(['status' => $status]);
+        return $transaction;
     }
 
     public function listTransactions(): array

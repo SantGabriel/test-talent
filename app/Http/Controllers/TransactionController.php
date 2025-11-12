@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTO\TransactionDTO;
+use App\Enums\PaymentStatus;
 use App\Http\Requests\TransactionRequest;
 use App\Models\Transaction;
 use App\Services\Payment\Abstract\CommonPaymentData;
@@ -41,5 +42,16 @@ class TransactionController extends Controller
             ]);
         else
             return response()->json("Transaction failed. Try Again later");
+    }
+
+    public function refund(Request $request)
+    {
+        $id = $request->route('id');
+        $transaction = $this->transactionService->refund($id);
+        if($transaction) {
+            return response()->json($transaction);
+        }else {
+            return response("Refund failed. Try Again later");
+        }
     }
 }
