@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property float $amount
+ * @property boolean $active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -43,7 +44,8 @@ class Product extends Model
      */
     protected $fillable = [
         'name',
-        'amount'
+        'amount',
+        'active'
     ];
 
     /**

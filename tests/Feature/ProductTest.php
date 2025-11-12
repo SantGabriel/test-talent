@@ -58,13 +58,11 @@ class ProductTest extends TestCase
 
     public function testDelete(): void
     {
-        $productOriginal = Product::factory([
+        $product = Product::factory([
             "name" => "Abacate",
             "amount" => 15,
         ])->create();
-        $this->delete("api/product/{$productOriginal->id}", [], $this->getAuth());
-        $productDeleted = Product::where('id', $productOriginal->id)
-            ->first();
-        $this->assertEquals(false, $productDeleted->active);
+        $this->delete("api/product/{$product->id}", [], $this->getAuth());
+        $this->assertEquals(false, $product->refresh()->active);
     }
 }
