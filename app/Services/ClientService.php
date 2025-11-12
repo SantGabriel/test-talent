@@ -14,6 +14,6 @@ class ClientService
 
     public function getById(int $id) : ?Client
     {
-        return Client::find($id);
+        return Client::with('transactions')->find($id);
     }
 }
