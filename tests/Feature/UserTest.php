@@ -79,6 +79,12 @@ class UserTest extends TestCase
         $this->assertDatabaseMissing('users', $user->toArray());
     }
 
+    public function testUserNotFound() {
+        $response = $this->get('api/user/0', $this->getAuth());
+
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
     public function testRolesRoute() {
         // Admin
         $token = $this->generateToken(Role::ADMIN);
