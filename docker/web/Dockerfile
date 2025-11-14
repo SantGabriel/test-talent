@@ -18,6 +18,8 @@ RUN pecl install redis && docker-php-ext-enable redis
 
 RUN a2enmod rewrite
 
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
 COPY ./apache.conf /etc/apache2/sites-available/000-default.conf
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
