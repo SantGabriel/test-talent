@@ -4,5 +4,4 @@ docker exec -it mysql-talent mysql -uroot -proot -e "CREATE DATABASE IF NOT EXIS
 
 docker exec -it web-talent composer install
 docker exec -it web-talent cp .env.example .env
-docker exec -it web-talent php artisan migrate
-docker exec -it web-talent php artisan db:seed
+docker exec -it web-talent php artisan migrate:fresh --seed
