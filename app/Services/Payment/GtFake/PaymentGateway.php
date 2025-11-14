@@ -37,7 +37,26 @@ class PaymentGateway extends AbstractPaymentGateway
      */
     public function transaction(Collection $productDTOList, Client $client, string $cardNumber, string $cvv): ?Transaction
     {
-        return null;
+        $totalValue = $this->calculateValue($productDTOList);
+        $transaction = Transaction::create([
+            'client' => $client->id,
+            'external_id' => "lalala",
+            'amount' => $totalValue,
+            'gateway' => $this->gateway->id,
+            'status' => PaymentStatus::REFUSED->value,
+            'card_last_numbers' => substr($cardNumber,-4)
+        ]);
+        $this->checkChangeStatus($transaction);
+
+        foreach ($productDTOList as $productDTO) {
+            TransactionProduct::create([
+                'product_id' => $productDTO->id,
+                'transaction_id' => $transaction->id,
+                'quantity' => $productDTO->quantity
+            ]);
+        }
+
+        return $transaction;
     }
 
     public function convertStatus(string $status): PaymentStatus
@@ -53,13 +72,7 @@ class PaymentGateway extends AbstractPaymentGateway
 
     public function getPaymentData(string $external_id): ?CommonPaymentData
     {
-        $response = Http::withHeaders($this->defaultAuthHeader())
-            ->get("{$this->base_url}/transacoes");
-        /** @var Collection<PaymentData> $paymentDataList */
-        $paymentDataList = collect($response->json('data'))->map(fn($params) => new PaymentData($params));
-        /** @var PaymentData $paymentData */
-        $paymentData = $paymentDataList->firstWhere('id', $external_id);
-        return $this->convertCommonPaymentData($paymentData->id, $paymentData->status, $paymentData->amount);
+        return null;
     }
 
     public function refund(int $id): ?Transaction

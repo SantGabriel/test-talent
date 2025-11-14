@@ -20,3 +20,7 @@ Decidir fazer um vídeo resumindo os detalhes do projeto em 5 minutos e como rep
 
 Todas as rotas estão dentro da collection do postman `postman_collection.json`
 
+## Detalhes do projeto
+
+- Todo Cliente é criado a partir do email. Se ele já existe, apenas busco ele do banco
+- Ao consultar uma transação. 
