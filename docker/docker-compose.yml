@@ -10,7 +10,6 @@ services:
     environment:
       XDEBUG_MODE: debug
       XDEBUG_CLIENT_HOST: host.docker.internal
-      PHP_IDE_CONFIG: serverName=debug
     extra_hosts:
       - "host.docker.internal:host-gateway"
   mysql:
